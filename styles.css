@@ -1,0 +1,82 @@
+.container {
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.main {
+    background-color: rgb(186, 73, 73);
+    min-height: 100vh;
+    width: 100%;
+    color: white;
+    transition: background-color 0.5s ease-in-out 0s;
+    padding-bottom: 12px;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top);
+    font-family: ArialRounded, serif;
+}
+
+.timer-app {
+    text-align: center;
+    padding-top: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.mb-2 {
+    margin-bottom: 2rem;
+}
+
+.mr-1 {
+    margin-right: 0.5rem;
+}
+
+.task {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tasks {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+}
+
+.rest {
+    background-color: rgb(56, 133, 138);
+}
+
+.long-rest {
+    background-color: rgb(57, 112, 151);
+}
+
+.timer {
+    font-size: 8rem;
+}
+
+.state {
+    padding: 0.2rem 1rem;
+    background: #0f0f0f3d;
+    display: inline-block;
+    border-radius: 6px;
+}
+
+.btn {
+    padding: 0.2rem 1rem;
+    background: rgb(255, 255, 255);
+    white-space: nowrap;
+    display: flex;
+    border-radius: 6px;
+    color: rgb(186, 73, 73);
+    border: none;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+}
+
+.centered {
+    margin: 0 auto;
+}

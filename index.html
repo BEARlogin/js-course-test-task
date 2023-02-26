@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-css-reset/dist/reset.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link href='https://unpkg.com/css.gg@2.0.0/icons/css/timer.css' rel='stylesheet'>
+    <link href='https://unpkg.com/css.gg@2.0.0/icons/css/play-pause-o.css' rel='stylesheet'>
+</head>
+<body>
+    <main class="main">
+        <div class="container">
+            <div class="timer-app">
+                <div class="head">
+                    <div class="timer mb-2"></div>
+                    <div class="state mb-2"></div>
+                    <button class="timer-button mb-2 btn centered" disabled onclick="onTimerButtonClick()">
+                        <i class="gg-timer mr-1"></i>
+                        Start Timer
+                    </button>
+                </div>
+                <div class="body">
+                    <div class="current-task mb-2"></div>
+                    <div class="tasks mb-2">
+
+                    </div>
+                </div>
+                <div class="footer">
+                    <div class="create-task-form">
+                        <form onsubmit="createTask()" id="create-task-form">
+                            <input placeholder="Title" class="mb-2" id="task-title-input" required />
+                            <button class="btn centered">Create Task</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</body>
+<script src="script.js"></script>
+</html>
