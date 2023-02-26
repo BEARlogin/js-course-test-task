@@ -15,7 +15,7 @@
                 <div class="head">
                     <div class="timer mb-2"></div>
                     <div class="state mb-2"></div>
-                    <button class="timer-button mb-2 btn centered" disabled onclick="onTimerButtonClick()">
+                    <button class="timer-button mb-2 btn centered" disabled onclick="runTimer()">
                         <i class="gg-timer mr-1"></i>
                         Start Timer
                     </button>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="footer">
                     <div class="create-task-form">
-                        <form onsubmit="createTask()" id="create-task-form">
+                        <form onsubmit="onCreateTask()" id="create-task-form">
                             <input placeholder="Title" class="mb-2" id="task-title-input" required />
                             <button class="btn centered">Create Task</button>
                         </form>
@@ -39,5 +39,10 @@
         </div>
     </main>
 </body>
+<script src="timer.js"></script>
+<script src="tasks.js"></script>
+<script src="formatter.js"></script>
+<script src="ui/TaskUi.js"></script>
+<script src="ui/TimerUi.js"></script>
 <script src="script.js"></script>
 </html>
