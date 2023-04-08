@@ -26,7 +26,15 @@
                         <div class="task" data-task-id="task-1">
                             <div>Задача 1</div>
                             <div>Not Done</div>
-                            <div class="task-pomodoro-actual">55</div>
+                            <div class="task-pomodoro-actual">1</div>
+                            <div class="task-pomodoro-plan">1</div>
+                            <input name="currentTask" type="radio" value="1">
+                            <button>Done</button>
+                        </div>
+                        <div class="task" data-task-id="task-1">
+                            <div>Задача 2</div>
+                            <div>Not Done</div>
+                            <div class="task-pomodoro-actual">1</div>
                             <div class="task-pomodoro-plan">1</div>
                             <input name="currentTask" type="radio" value="1">
                             <button>Done</button>
@@ -37,6 +45,7 @@
                     <div class="create-task-form">
                         <form id="create-task-form">
                             <input placeholder="Title" class="mb-2" id="task-title-input" required />
+                            <input placeholder="Plan" type="number" class="mb-2" id="task-plan-input" required />
                             <button class="btn centered">Create Task</button>
                         </form>
                     </div>
