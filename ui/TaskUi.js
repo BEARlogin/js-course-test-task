@@ -13,7 +13,7 @@ function TasksUi() {
                 <div>${ done ? 'Done' : 'Not Done'}</div>
                 <div class="task-pomodoro-actua">${actual}</div>
                 <div class="task-pomodoro-plan">${plan}</div>
-                <input name="currentTask" ${currentTask?.id === id ? 'checked' : ''} type="radio" value="${id}" />
+                <input oninput="setCurrentTask(${id})" name="currentTask" ${currentTask?.id === id ? 'checked' : ''} type="radio" value="${id}" />
                 <button>Done</button>
             </div>
         `;

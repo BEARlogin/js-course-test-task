@@ -37,9 +37,9 @@ function onCreateTask() {
     renderTasks(tasks);
 }
 
-function setCurrentTask(task) {
-    currentTask = task;
-    renderCurrentTask(task);
+function setCurrentTask(taskId) {
+    currentTask = tasks.find(t => t.id === taskId);
+    renderCurrentTask(currentTask);
     enableButton();
 }
 
