@@ -2,14 +2,16 @@ const timeBreakSeconds = 10;
 const pomodoroSeconds = 20;
 let currentTask = null;
 
-const {startTimer, stopTimer, runTimer,  togglePauseTimer, timerStates, currentTimerState}
+const {startTimer, stopTimer, runTimer, togglePauseTimer, timerStates, currentTimerState}
     = Timer(undefined, (old, current) => {
-    if(old === timerStates.STOPPED && current === timerStates.RUNNING) {
+    console.log({old, current});
+    if (old === timerStates.STOPPED && current === timerStates.RUNNING) {
         startPomodoroTimer();
-    } else if(old === timerStates.RUNNING && current === timerStates.PAUSED) {
+    } else if (old === timerStates.RUNNING && current === timerStates.PAUSED) {
         updateTimerButtonText('Resume');
     }
-    else if(current === timerStates.RUNNING) {
+
+    if (current === timerStates.RUNNING) {
         updateTimerButtonText('Pause');
     }
 });

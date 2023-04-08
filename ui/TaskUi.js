@@ -7,43 +7,20 @@ function TasksUi() {
     function createTaskNode(task) {
         const { title, done, actual, plan, id } = task;
 
-        const nodeTask = document.createElement('div');
-        nodeTask.setAttribute('data-task-id', `task-${id}`);
-        nodeTask.classList.add('task');
+        const taskTemplate = `
+            <div class="task" data-task-id="task-${id}">
+                <div>${title}</div>
+                <div>${ done ? 'Done' : 'Not Done'}</div>
+                <div class="task-pomodoro-actua">${actual}</div>
+                <div class="task-pomodoro-plan">${plan}</div>
+                <input name="currentTask" ${currentTask?.id === id ? 'checked' : ''} type="radio" value="${id}" />
+                <button>Done</button>
+            </div>
+        `;
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(taskTemplate, 'text/html');
 
-        const nodeTitle = document.createElement('div');
-        nodeTitle.innerHTML = title;
-
-        const nodeStatus = document.createElement('div');
-        nodeStatus.innerHTML = done ? 'Done' : 'Not Done';
-
-        const nodeActual = document.createElement('div');
-        nodeActual.innerHTML = actual;
-
-        const nodePlan = document.createElement('div');
-        nodePlan.innerHTML = plan;
-
-        const nodeSelector = document.createElement('input');
-
-        nodeActual.classList.add('task-pomodoro-actual');
-        nodePlan.classList.add('task-pomodoro-plan');
-
-        const buttonDone = document.createElement('button');
-
-        nodeSelector.setAttribute('type','radio');
-        nodeSelector.setAttribute('name','currentTask');
-        nodeSelector.setAttribute('value', id)
-
-        if(currentTask?.id === id) {
-            nodeSelector.setAttribute('checked', 'checked')
-        }
-
-        nodeSelector.oninput = () => {
-            setCurrentTask(task)
-        }
-
-        nodeTask.append(nodeTitle, nodeStatus, nodeActual, nodePlan, nodeSelector);
-        return nodeTask;
+        return dom.querySelector('.task');
     }
 
     function renderTasks(tasks) {
