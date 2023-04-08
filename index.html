@@ -9,12 +9,12 @@
     <link href='https://unpkg.com/css.gg@2.0.0/icons/css/play-pause-o.css' rel='stylesheet'>
 </head>
 <body>
-    <main class="main">
+    <main class="main break">
         <div class="container">
             <div class="timer-app">
                 <div class="head">
-                    <div class="timer mb-2"></div>
-                    <div class="state mb-2"></div>
+                    <div class="timer mb-2">00:00:20</div>
+                    <div class="state mb-2">Pomodoro</div>
                     <button class="timer-button mb-2 btn centered" disabled onclick="runTimer()">
                         <i class="gg-timer mr-1"></i>
                         Start Timer
@@ -23,12 +23,19 @@
                 <div class="body">
                     <div class="current-task mb-2"></div>
                     <div class="tasks mb-2">
-
+                        <div class="task" data-task-id="task-1">
+                            <div>Задача 1</div>
+                            <div>Not Done</div>
+                            <div class="task-pomodoro-actual">55</div>
+                            <div class="task-pomodoro-plan">1</div>
+                            <input name="currentTask" type="radio" value="1">
+                            <button>Done</button>
+                        </div>
                     </div>
                 </div>
                 <div class="footer">
                     <div class="create-task-form">
-                        <form onsubmit="onCreateTask()" id="create-task-form">
+                        <form id="create-task-form">
                             <input placeholder="Title" class="mb-2" id="task-title-input" required />
                             <button class="btn centered">Create Task</button>
                         </form>
@@ -38,10 +45,4 @@
         </div>
     </main>
 </body>
-<script src="timer.js"></script>
-<script src="tasks.js"></script>
-<script src="formatter.js"></script>
-<script src="ui/TaskUi.js"></script>
-<script src="ui/TimerUi.js"></script>
-<script src="script.js"></script>
 </html>
