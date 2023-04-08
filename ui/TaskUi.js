@@ -28,6 +28,8 @@ function TasksUi() {
         nodeActual.classList.add('task-pomodoro-actual');
         nodePlan.classList.add('task-pomodoro-plan');
 
+        const buttonDone = document.createElement('button');
+
         nodeSelector.setAttribute('type','radio');
         nodeSelector.setAttribute('name','currentTask');
         nodeSelector.setAttribute('value', id)

@@ -6,6 +6,10 @@ const {startTimer, stopTimer, runTimer,  togglePauseTimer, timerStates, currentT
     = Timer(undefined, (old, current) => {
     if(old === timerStates.STOPPED && current === timerStates.RUNNING) {
         startPomodoroTimer();
+    } else if(old === timerStates.RUNNING && current === timerStates.PAUSED) {
+        updateTimerButtonText('Resume');
+    }
+    else if(current === timerStates.RUNNING) {
         updateTimerButtonText('Pause');
     }
 });
@@ -15,6 +19,9 @@ const {renderCurrentTask, createTaskNode, getTaskData, renderTasks} = TasksUi();
 
 
 function init() {
+    fetch('http://localhost:3005/tasks').then(res => {
+        res.json().then(data => console.log(data));
+    })
     document.getElementById('create-task-form')
         .addEventListener('submit', e => e.preventDefault())
     renderTimerDisplay(pomodoroSeconds)
