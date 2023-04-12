@@ -93,7 +93,7 @@ class TaskRepository {
     this.items.push({ ...task, id: this.createId() });
   }
 
-  #findIndexByIdOrThrow(id) {
+  findIndexByIdOrThrow(id) {
     const itemIndex = this.items.findIndex((item) => item.id === id);
 
     if (itemIndex === -1) {
@@ -104,27 +104,27 @@ class TaskRepository {
   }
 
   update(id, data) {
-    const itemIndex = this.findIndexOrThrow(id);
-
-    this.items = this.items.splice(itemIndex, 1, {
+    const itemIndex = this.findIndexByIdOrThrow(id);
+    const updated = {
       ...this.items[itemIndex],
       ...data,
-    });
+    };
+    this.items.splice(itemIndex, 1, updated);
   }
 
   delete(id) {
-    this.items = this.items.splice(this.findIndexOrThrow(id), 1);
+    this.items.splice(this.findIndexByIdOrThrow(id), 1);
   }
 
   getById(id) {
-    return this.items[this.findIndexOrThrow(id)];
+    return this.items[this.findIndexByIdOrThrow(id)];
   }
 
   getAll() {
     return this.items;
   }
 
-  #createId() {
+  createId() {
     return this.items.length + 1;
   }
 }
@@ -141,4 +141,8 @@ console.log(taskRepo);
 taskRepo.create(new Task({ title: "Task1", plan: 2 }));
 taskRepo.create(new Task({ title: "Task2", plan: 2 }));
 console.log(taskRepo);
-taskRepo.getById(123);
+taskRepo.getById(1);
+taskRepo.update(1, { done: true });
+taskRepo.getById(1);
+taskRepo.delete(2);
+debugger;
