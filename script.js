@@ -14,6 +14,7 @@ function formatTimeWithLeadingZero(hours, minutes, seconds) {
 }
 
 class ItemNotFoundException extends Error {}
+class UnknownState extends Error {}
 
 class Timer {
   static states = Object.freeze({
@@ -23,18 +24,36 @@ class Timer {
   });
 
   static phases = Object.freeze({
-    STOPPED: "STOPPED",
+    POMODORO: "POMODORO",
+    BREAK: "BREAK",
+    LONG_BREAK: "LONG_BREAK",
   });
+
+  transitions = {
+    [Timer.phases.POMODORO]: {
+      to: Timer.phases.BREAK,
+      onTransition() {
+        this.state.currentTime = this.config.breakTime * 60;
+      },
+    },
+    [Timer.phases.BREAK]: {
+      to: Timer.phases.POMODORO,
+      onTransition() {
+        this.state.currentTime = this.config.pomodoroTime * 60;
+      },
+    },
+  };
 
   constructor(timerConfig) {
     const {
-      currentPhase = Timer.phases.STOPPED,
+      currentPhase = Timer.phases.POMODORO,
+      currentState = Timer.states.STOPPED,
       breakTime = 5,
-      pomodoroTime = 25,
+      pomodoroTime = 0.5,
       colors = {
-        POMODORO: "#ba4949",
-        BREAK: "#397097",
-        LONG_BREAK: "#333333",
+        [Timer.phases.POMODORO]: "#ba4949",
+        [Timer.phases.BREAK]: "#397097",
+        [Timer.phases.LONG_BREAK]: "#333333",
       },
     } = timerConfig;
     this.config = {
@@ -44,12 +63,64 @@ class Timer {
     };
     this.state = {
       currentPhase,
+      currentState,
       currentTime: pomodoroTime * 60,
     };
   }
 
+  onStateChange(oldState, newState) {}
+
+  setState(newState) {
+    if (!newState in Timer.states) {
+      throw new UnknownState(`Unknown state ${newState}`);
+    }
+
+    this.onStateChange(this.state.currentState, newState);
+    this.state.currentState = newState;
+  }
+
+  setPhase(newPhase) {
+    this.state.currentPhase = newPhase;
+  }
+
+  run() {
+    this.interval = setInterval(() => {
+      this.tick();
+    }, 1000);
+    this.setState(Timer.states.RUNNING);
+  }
+
+  pause() {
+    this.clear();
+    this.setState(Timer.states.PAUSED);
+  }
+
+  onTimerEnd() {
+    const transition = this.transitions[this.state.currentPhase];
+    const bindedTransition = transition.onTransition.bind(this);
+    bindedTransition();
+    this.setPhase(transition.to);
+  }
+
+  onTick() {
+    if (this.state.currentTime <= 0) {
+      this.onTimerEnd();
+    }
+  }
+
+  stop() {
+    this.clear();
+    this.setState(Timer.states.STOPPED);
+  }
+
+  clear() {
+    clearInterval(this.interval);
+  }
+
   tick() {
     this.state.currentTime -= 1;
+    this.onTick();
+    console.log(this.formattedTime);
   }
 
   get formattedTime() {
@@ -57,12 +128,12 @@ class Timer {
     const minutes = Math.floor((this.state.currentTime - hours * 3600) / 60);
     const seconds = this.state.currentTime - hours * 3600 - minutes * 60;
 
-    Timer.formatTimeWithLeadingZero(hours, minutes, seconds);
+    return Timer.formatTimeWithLeadingZero(hours, minutes, seconds);
   }
 
   get formattedTimeWithDate() {
     const date = new Date(this.state.currentTime * 1000);
-    Timer.formatTimeWithLeadingZero(
+    return Timer.formatTimeWithLeadingZero(
       date.getUTCHours(),
       date.getUTCMinutes(),
       date.getUTCSeconds()
@@ -145,4 +216,4 @@ taskRepo.getById(1);
 taskRepo.update(1, { done: true });
 taskRepo.getById(1);
 taskRepo.delete(2);
-debugger;
+timer.run();
