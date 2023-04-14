@@ -29,6 +29,12 @@ class Timer {
     LONG_BREAK: "LONG_BREAK",
   });
 
+  static colors = {
+    [Timer.phases.POMODORO]: "#ba4949",
+    [Timer.phases.BREAK]: "#397097",
+    [Timer.phases.LONG_BREAK]: "#333333",
+  };
+
   transitions = {
     [Timer.phases.POMODORO]: {
       to: Timer.phases.BREAK,
@@ -44,18 +50,20 @@ class Timer {
     },
   };
 
-  constructor(timerConfig) {
+  constructor(timerConfig = {}) {
     const {
       currentPhase = Timer.phases.POMODORO,
       currentState = Timer.states.STOPPED,
-      breakTime = 5,
-      pomodoroTime = 0.5,
+      eventHandlers,
+      breakTime = 0.1,
+      pomodoroTime = 0.25,
       colors = {
         [Timer.phases.POMODORO]: "#ba4949",
         [Timer.phases.BREAK]: "#397097",
         [Timer.phases.LONG_BREAK]: "#333333",
       },
     } = timerConfig;
+    this.eventHandlers = eventHandlers;
     this.config = {
       breakTime,
       pomodoroTime,
@@ -68,7 +76,13 @@ class Timer {
     };
   }
 
-  onStateChange(oldState, newState) {}
+  onStateChange(oldState, newState) {
+    if (typeof this.eventHandlers.onStateChange !== "function") {
+      return;
+    }
+
+    this.eventHandlers.onStateChange(oldState, newState);
+  }
 
   setState(newState) {
     if (!newState in Timer.states) {
@@ -80,7 +94,22 @@ class Timer {
   }
 
   setPhase(newPhase) {
+    if (typeof this.eventHandlers.onPhaseСhange === "function") {
+      this.eventHandlers.onPhaseСhange(this.state.currentPhas, newPhase);
+    }
     this.state.currentPhase = newPhase;
+  }
+
+  runClick() {
+    if (
+      [Timer.states.STOPPED, Timer.states.PAUSED].includes(
+        this.state.currentState
+      )
+    ) {
+      this.run();
+    } else if (this.state.currentState === Timer.states.RUNNING) {
+      this.pause();
+    }
   }
 
   run() {
@@ -106,6 +135,10 @@ class Timer {
     if (this.state.currentTime <= 0) {
       this.onTimerEnd();
     }
+    if (typeof this.eventHandlers.onTick !== "function") {
+      return;
+    }
+    this.eventHandlers.onTick();
   }
 
   stop() {
@@ -200,20 +233,70 @@ class TaskRepository {
   }
 }
 
-const timer = new Timer({ breakTime: 10 });
-console.log(timer.state.currentTime);
-timer.tick();
-console.log(timer.state.currentTime);
-console.log(timer.formattedTime);
-console.log(timer.formattedTimeWithDate);
+class App {
+  constructor({ id }) {
+    this.appNode = document.getElementById(id);
+  }
 
-const taskRepo = new TaskRepository();
-console.log(taskRepo);
-taskRepo.create(new Task({ title: "Task1", plan: 2 }));
-taskRepo.create(new Task({ title: "Task2", plan: 2 }));
-console.log(taskRepo);
-taskRepo.getById(1);
-taskRepo.update(1, { done: true });
-taskRepo.getById(1);
-taskRepo.delete(2);
-timer.run();
+  main() {
+    this.timer = new Timer({
+      eventHandlers: {
+        onTick: () => {
+          this.updateTimer(this.timer.formattedTime);
+        },
+        onStateChange: (oldState, newState) => {
+          this.onStateChange(oldState, newState);
+        },
+        onPhaseСhange: (oldPhase, newPhase) => {
+          this.onPhaseСhange(oldPhase, newPhase);
+        },
+      },
+    });
+    this.repo = new TaskRepository();
+    this.updateTimer(this.timer.formattedTime);
+    this.registerHandlers();
+  }
+
+  onStateChange(oldState, newState) {
+    let buttonText = "";
+    if (newState === Timer.states.RUNNING) {
+      buttonText = "Pause timer";
+    } else {
+      buttonText = "Resume timer";
+    }
+    this.appNode.querySelector(".timer-button-text").textContent = buttonText;
+  }
+
+  onPhaseСhange(oldPhase, newPhase) {
+    let phaseText = "";
+    if (newPhase === Timer.phases.BREAK) {
+      phaseText = "Break";
+    } else {
+      phaseText = "Pomodoro";
+    }
+    this.appNode.querySelector(".state").textContent = phaseText;
+    document.querySelector(".main").style.backgroundColor =
+      Timer.colors[newPhase];
+  }
+
+  updateTimer(value) {
+    this.appNode.querySelector(".timer").textContent = value;
+  }
+
+  onTimerButtonClick() {
+    this.timer.runClick();
+  }
+
+  registerHandlers() {
+    this.appNode
+      .querySelector(".timer-button")
+      .addEventListener("click", () => {
+        this.onTimerButtonClick();
+      });
+  }
+}
+
+void (function main() {
+  const app = new App({ id: "timer-app" });
+  app.main();
+})();
