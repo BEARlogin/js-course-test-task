@@ -15,7 +15,7 @@ import { TimerApp } from "./timer-app.js";
 void (function main() {
   const repo = new TaskRepository();
   const app = new TimerApp({
-    id: "timer-app",
+    id: "timer-app-2",
     eventHandlers: {
       onPhaseСhange: (oldPhase, newPhase) => {
         if (newPhase === Timer.phases.BREAK) {
