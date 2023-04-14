@@ -187,14 +187,41 @@ class Task {
   constructor({ title, plan }) {
     this.title = title;
     this.plan = plan;
+    this.actual = 0;
   }
 }
 
 class TaskRepository {
   items = [];
+  key = "tasks";
+
+  constructor() {
+    this.restorState();
+  }
+
+  persistState() {
+    localStorage.setItem(this.key, JSON.stringify(this.items));
+  }
+
+  restorState() {
+    const jsonData = localStorage.getItem(this.key);
+
+    if (!jsonData) {
+      this.items = [];
+      return;
+    }
+
+    try {
+      const data = JSON.parse(jsonData);
+      this.items = data;
+    } catch (e) {
+      this.items = [];
+    }
+  }
 
   create(task) {
     this.items.push({ ...task, id: this.createId() });
+    this.persistState();
   }
 
   findIndexByIdOrThrow(id) {
@@ -214,10 +241,12 @@ class TaskRepository {
       ...data,
     };
     this.items.splice(itemIndex, 1, updated);
+    this.persistState();
   }
 
   delete(id) {
     this.items.splice(this.findIndexByIdOrThrow(id), 1);
+    this.persistState();
   }
 
   getById(id) {
@@ -231,11 +260,118 @@ class TaskRepository {
   createId() {
     return this.items.length + 1;
   }
+
+  getSelectedTask() {
+    return this.items.find((task) => task.selected);
+  }
+
+  selectTask(id) {
+    this.items = this.items.map((item) => ({
+      ...item,
+      selected: item.id === Number.parseInt(id),
+    }));
+    this.persistState();
+  }
+}
+
+class TaskApp {
+  _selectedTaskId = null;
+
+  constructor({ repo, id, eventHandlers }) {
+    this.repo = repo;
+    this.appNode = document.getElementById(id);
+    this.eventHandlers = eventHandlers;
+  }
+
+  set selectedTaskId(val) {
+    this._selectedTaskId = val;
+    if (!this.eventHandlers.onTaskSelect) {
+      return;
+    }
+    this.eventHandlers.onTaskSelect(val);
+  }
+
+  get selectedTaskId() {
+    return this._selectedTaskId;
+  }
+
+  main() {
+    const selectedTaskCandidate = this.repo.items.find((s) => s.selected);
+
+    if (selectedTaskCandidate) {
+      this.selectedTaskId = selectedTaskCandidate.id;
+      this.eventHandlers.onTaskSelect(this.selectedTaskId);
+    }
+
+    this.renderTasksList();
+    this.registerEventHandlers();
+  }
+
+  registerEventHandlers() {
+    const form = document.getElementById("create-task-form");
+
+    form.addEventListener("submit", (event) => {
+      var formData = new FormData(form);
+      const { title, plan } = Object.fromEntries(formData.entries());
+      this.repo.create(
+        new Task({
+          title,
+          plan,
+        })
+      );
+      this.renderTasksList();
+      event.preventDefault();
+    });
+  }
+
+  registerTasksEvent() {
+    const nodes = this.appNode.querySelectorAll(".task input");
+
+    nodes.forEach((node) => {
+      node.addEventListener("input", (event) => {
+        this.selectedTaskId = event.target.value;
+        this.repo.selectTask(this.selectedTaskId);
+      });
+    });
+  }
+
+  createTaskTemplate(task) {
+    return `
+      <div class="task" data-task-id="task-${task.id}">
+          <div>${task.title}</div>
+          <div>${task.done ? "Done" : "Not done"}</div>
+          <div class="task-pomodoro-actual">${task.actual}</div>
+          <div class="task-pomodoro-plan">${task.plan}</div>
+          <input ${
+            task.selected ? "checked" : ""
+          } name="currentTask" type="radio" value="${task.id}">
+          <button>Done</button>
+      </div>
+    `;
+  }
+
+  updateTaskActual(taskId, actual) {
+    const taskElement = this.appNode.querySelector(
+      `[data-task-id="task-${taskId}"]`
+    );
+    taskElement.querySelector(".task-pomodoro-actual").textContent = actual;
+  }
+
+  renderTasksList() {
+    const tasks = this.repo.getAll();
+    const tasksTemplates = tasks.reduce((acc, task) => {
+      acc += this.createTaskTemplate(task);
+      return acc;
+    }, "");
+    this.appNode.querySelector(".tasks").innerHTML = tasksTemplates;
+    this.registerTasksEvent();
+  }
 }
 
 class App {
-  constructor({ id }) {
+  constructor({ id, eventHandlers }) {
     this.appNode = document.getElementById(id);
+    this.eventHandlers = eventHandlers;
   }
 
   main() {
@@ -248,11 +384,11 @@ class App {
           this.onStateChange(oldState, newState);
         },
         onPhaseСhange: (oldPhase, newPhase) => {
+          this.eventHandlers?.onPhaseСhange(oldPhase, newPhase);
           this.onPhaseСhange(oldPhase, newPhase);
         },
       },
     });
-    this.repo = new TaskRepository();
     this.updateTimer(this.timer.formattedTime);
     this.registerHandlers();
   }
@@ -287,16 +423,55 @@ class App {
     this.timer.runClick();
   }
 
+  get timerButton() {
+    return this.appNode.querySelector(".timer-button");
+  }
+
   registerHandlers() {
-    this.appNode
-      .querySelector(".timer-button")
-      .addEventListener("click", () => {
-        this.onTimerButtonClick();
-      });
+    this.timerButton.addEventListener("click", () => {
+      this.onTimerButtonClick();
+    });
+  }
+
+  enableButton() {
+    this.timerButton.removeAttribute("disabled");
   }
 }
 
 void (function main() {
-  const app = new App({ id: "timer-app" });
+  const repo = new TaskRepository();
+  const app = new App({
+    id: "timer-app",
+    eventHandlers: {
+      onPhaseСhange: (oldPhase, newPhase) => {
+        if (newPhase === Timer.phases.BREAK) {
+          const selectedTaskCandidate = repo.getSelectedTask();
+
+          if (!selectedTaskCandidate) {
+            return;
+          }
+
+          repo.update(selectedTaskCandidate.id, {
+            actual: selectedTaskCandidate.actual + 1,
+          });
+
+          taskApp.updateTaskActual(
+            selectedTaskCandidate.id,
+            selectedTaskCandidate.actual + 1
+          );
+        }
+      },
+    },
+  });
   app.main();
+  const taskApp = new TaskApp({
+    repo,
+    id: "tasks-app",
+    eventHandlers: {
+      onTaskSelect: (selectedTaskId) => {
+        app.enableButton();
+      },
+    },
+  });
+  taskApp.main();
 })();

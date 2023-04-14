@@ -11,43 +11,45 @@
 <body>
     <main class="main break">
         <div class="container">
-            <div id="timer-app" class="timer-app">
+            <div class="timer-app">
                 <div class="head">
-                    <div class="timer mb-2">00:00:00</div>
-                    <div class="state mb-2">Pomodoro</div>
-                    <button class="timer-button mb-2 btn centered">
-                        <i class="gg-timer mr-1"></i>
-                        <span class="timer-button-text">Start Timer</span>
-                    </button>
-                </div>
-                <div class="body">
-                    <div class="current-task mb-2"></div>
-                    <div class="tasks mb-2">
-                        <div class="task" data-task-id="task-1">
-                            <div>Задача 1</div>
-                            <div>Not Done</div>
-                            <div class="task-pomodoro-actual">1</div>
-                            <div class="task-pomodoro-plan">1</div>
-                            <input name="currentTask" type="radio" value="1">
-                            <button>Done</button>
-                        </div>
-                        <div class="task" data-task-id="task-1">
-                            <div>Задача 2</div>
-                            <div>Not Done</div>
-                            <div class="task-pomodoro-actual">1</div>
-                            <div class="task-pomodoro-plan">1</div>
-                            <input name="currentTask" type="radio" value="1">
-                            <button>Done</button>
-                        </div>
+                    <div id="timer-app">
+                        <div class="timer mb-2">00:00:00</div>
+                        <div class="state mb-2">Pomodoro</div>
+                        <button class="timer-button mb-2 btn centered" disabled>
+                            <i class="gg-timer mr-1"></i>
+                            <span class="timer-button-text">Start Time</span>
+                        </button>
                     </div>
                 </div>
-                <div class="footer">
-                    <div class="create-task-form">
-                        <form id="create-task-form">
-                            <input placeholder="Title" class="mb-2" id="task-title-input" required />
-                            <input placeholder="Plan" type="number" class="mb-2" id="task-plan-input" required />
-                            <button class="btn centered">Create Task</button>
-                        </form>
+                <div class="body">
+                    <div id="tasks-app">
+                        <div class="current-task mb-2"></div>
+                        <div class="tasks mb-2">
+                            <div class="task" data-task-id="task-1">
+                                <div>Задача 1</div>
+                                <div>Not Done</div>
+                                <div class="task-pomodoro-actual">1</div>
+                                <div class="task-pomodoro-plan">1</div>
+                                <input name="currentTask" type="radio" value="1">
+                                <button>Done</button>
+                            </div>
+                            <div class="task" data-task-id="task-1">
+                                <div>Задача 2</div>
+                                <div>Not Done</div>
+                                <div class="task-pomodoro-actual">1</div>
+                                <div class="task-pomodoro-plan">1</div>
+                                <input name="currentTask" type="radio" value="1">
+                                <button>Done</button>
+                            </div>
+                        </div>
+                        <div class="create-task-form">
+                            <form id="create-task-form">
+                                <input placeholder="Title" name="title" class="mb-2" id="task-title-input" required />
+                                <input placeholder="Plan" name="plan" type="number" class="mb-2" id="task-plan-input" required />
+                                <button class="btn centered">Create Task</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
