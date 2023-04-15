@@ -11,21 +11,23 @@ import { Timer } from "./timer.js";
 import { TaskRepository } from "./repo.js";
 import TasksApp from "./tasks-app.js";
 import { TimerApp } from "./timer-app.js";
+import { TaskBackRepository } from "./repo-back.js";
 
 void (function main() {
-  const repo = new TaskRepository();
+  const repo = new TaskBackRepository();
   const app = new TimerApp({
-    id: "timer-app-2",
+    id: "timer-app",
     eventHandlers: {
-      onPhaseСhange: (oldPhase, newPhase) => {
+      onPhaseСhange: async (oldPhase, newPhase) => {
         if (newPhase === Timer.phases.BREAK) {
-          const selectedTaskCandidate = repo.getSelectedTask();
+          const selectedTaskCandidate = await repo.getSelectedTask();
 
           if (!selectedTaskCandidate) {
             return;
           }
 
           repo.update(selectedTaskCandidate.id, {
+            ...selectedTaskCandidate,
             actual: selectedTaskCandidate.actual + 1,
           });
 

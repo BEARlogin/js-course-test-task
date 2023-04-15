@@ -1,3 +1,5 @@
+import { Task } from "./models/task";
+
 class TasksApp {
   _selectedTaskId = null;
 
@@ -19,32 +21,35 @@ class TasksApp {
     return this._selectedTaskId;
   }
 
-  main() {
-    const selectedTaskCandidate = this.repo.items.find((s) => s.selected);
+  async main() {
+    const selectedTaskCandidate = await this.repo.getSelectedTask();
 
     if (selectedTaskCandidate) {
       this.selectedTaskId = selectedTaskCandidate.id;
       this.eventHandlers.onTaskSelect(this.selectedTaskId);
     }
 
-    this.renderTasksList();
     this.registerEventHandlers();
+
+    this.renderTasksList();
   }
 
   registerEventHandlers() {
     const form = document.getElementById("create-task-form");
-
     form.addEventListener("submit", (event) => {
+      event.preventDefault();
       var formData = new FormData(form);
       const { title, plan } = Object.fromEntries(formData.entries());
-      this.repo.create(
-        new Task({
-          title,
-          plan,
-        })
-      );
-      this.renderTasksList();
-      event.preventDefault();
+      this.repo
+        .create(
+          new Task({
+            title,
+            plan,
+          })
+        )
+        .then(() => {
+          this.renderTasksList();
+        });
     });
   }
 
@@ -81,8 +86,9 @@ class TasksApp {
     taskElement.querySelector(".task-pomodoro-actual").textContent = actual;
   }
 
-  renderTasksList() {
-    const tasks = this.repo.getAll();
+  async renderTasksList() {
+    const tasks = await this.repo.getAll();
+
     const tasksTemplates = tasks.reduce((acc, task) => {
       acc += this.createTaskTemplate(task);
       return acc;
